@@ -39,5 +39,21 @@ ld wrotten in go
 
 ## x86 asm 正常
 
+```
+nasm -f elf64 asm.asm -o asm.o
+ld -s -static -T asm.lds -o asm asm.o
+gcc -Wl,-dynamic-linker,asm -o hello hello.c
+╭─st0n3@yoga in ~/myproject/ld_myth on main ✘ (origin/main)
+╰$ ./hello 
+[1]    64101 segmentation fault  ./hello
+```
 
 ## x86-64 段错误
+```
+nasm -f elf64 asm2.asm -o asm2.o
+ld -s -static -T asm.lds -o asm2 asm2.o
+gcc -Wl,-dynamic-linker,asm2 -o hello hello.c
+╭─st0n3@yoga in ~/myproject/ld_myth on main ✔ (origin/main)
+╰$ ./hello 
+[1]    63992 segmentation fault  ./hello
+```
