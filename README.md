@@ -36,3 +36,8 @@ hello.c:2:5: warning: implicit declaration of function ‘puts’ [-Wimplicit-fu
 ╰$ ./hello 
 ld wrotten in go
 ```
+
+## x86 asm 正常
+
+
+## x86-64 段错误
