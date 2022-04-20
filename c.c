@@ -1,3 +1,3 @@
 void main(){
-    puts("hello");
+    puts("ld wrotten in c");
 }
