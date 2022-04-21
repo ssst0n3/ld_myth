@@ -1,3 +1,37 @@
+BITS 64
+
+ehdr:
+    db      0x7F, "ELF", 2, 1, 1, 0         ;   e_ident
+    db      0, 0, 0, 0, 0, 0, 0, 0
+    dw      3                               ;   e_type
+    dw      0x3E                            ;   e_machine
+    dd      1                               ;   e_version
+    dq      _start                          ;   e_entry
+    dq      phdr - $$                       ;   e_phoff
+    dq      0                               ;   e_shoff
+    dd      0                               ;   e_flags
+    dw      ehdrsize                        ;   e_ehsize
+    dw      phdrsize                        ;   e_phentsize
+    dw      1                               ;   e_phnum
+    dw      0                               ;   e_shentsize
+    dw      0                               ;   e_shnum
+    dw      0                               ;   e_shstrndx
+
+ehdrsize equ $ - phdr
+
+phdr:
+phdr_load:
+    dd      1                               ;   p_type
+    dd      7                               ;   p_flags
+    dq      0                               ;   p_offset
+    dq      $$                              ;   p_vaddr
+    dq      $$                              ;   p_paddr
+    dq      filesize                        ;   p_filesz
+    dq      filesize                        ;   p_memsz
+    dq      0x1000                          ;   p_align
+
+phdrsize    equ $ - phdr
+
 global _start
 
 section .text
@@ -102,3 +136,5 @@ section .data
     payload db 69, 76, 70, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 1, 0, 0, 0, 84, 128, 4, 8, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 32, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 128, 4, 8, 0, 128, 4, 8, 152, 0, 0, 0, 220, 0, 0, 0, 7, 0, 0, 0, 0, 16, 0, 0, 49, 219, 247, 227, 83, 67, 83, 106, 2, 137, 225, 176, 102, 205, 128, 147, 89, 176, 63, 205, 128, 73, 121, 249, 104, 127, 0, 0, 1, 104, 2, 0, 91, 37, 137, 225, 176, 102, 80, 81, 83, 179, 3, 137, 225, 205, 128, 82, 104, 110, 47, 115, 104, 104, 47, 47, 98, 105, 137, 227, 82, 83, 137, 225, 176, 11, 205, 128
 
 ;section    .bss
+
+filesize equ $ - $$
