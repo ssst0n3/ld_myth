@@ -38,8 +38,8 @@ prepare_pipe:
 write: 
     mov rax, SYS_WRITE
     mov rdx, PAGE_SIZE
-    mov rsi, [rsp+8]                                ;buffer
-    mov rdi, [rsp+4]                                ; p[1]
+    lea rsi, [rsp+8]                                ;buffer
+    lea rdi, [rsp+4]                                ; p[1]
     syscall
 
 ; *******************
@@ -47,10 +47,10 @@ write:
 ; init pipe with 65536
 ; *******************
 read: 
+    mov rax, SYS_READ
     mov rdx, PAGE_SIZE
     lea rsi,  [rsp+8]                         ;buffer
     lea rdi,  [rsp]                          ; p[0]
-    mov rax, SYS_READ
     syscall
 
 ; *******************
@@ -146,7 +146,7 @@ section .data
     errMsgOpen         db    "Error opening the file.", LF, NULL
     errMsgRead         db    "Error reading from the file.", LF, NULL
     fileDesc       dq       0
-    payload db "st0n3st0n3st0n3"
+    payload db "st0n3st0n3st0n3",NULL
 
 section    .bss
 readBuffer resb     BUFF_SIZE
