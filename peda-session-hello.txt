@@ -1,2 +1,4 @@
-break *0x7ffff7ffe0a1
+break *0x00007fffffffe0e9
+break *0x00007ffff7ffe030
+
 

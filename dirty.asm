@@ -46,7 +46,8 @@ open:
     mov rax, SYS_OPEN
     mov rdx, 0
     mov rsi, O_RDONLY                          ;flags
-    mov rdi, runc                                       ;filename
+    ;mov rdi, runc                                       ;filename
+    lea rdi, [rel runc
     syscall
 
 ; *******************

