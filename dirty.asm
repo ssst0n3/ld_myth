@@ -6,7 +6,7 @@ _start:
     call main
 
 main:
-    sub rsp, 8+65536
+    sub rsp, 8+PAGE_SIZE
 
 ; *******************
 ; open
@@ -137,7 +137,7 @@ section .data
     STDOUT:                       equ 1
     O_RDONLY           equ    000000q        ; read only
     BUFF_SIZE          equ 255
-    PAGE_SIZE           equ 4096
+    PAGE_SIZE           equ 65536
     MAX_LENGTH equ 4095
     ; ********string*******
     runc db '/tmp/fd',NULL ; runc fd
