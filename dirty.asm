@@ -28,7 +28,7 @@ open:
 ; *******************
 prepare_pipe:
     mov rax, SYS_PIPE
-    lea rdi, [rsp+8]                                       ; p
+    lea rdi, [rsp]                                       ; p
     syscall
 
 ; *******************
@@ -38,7 +38,7 @@ prepare_pipe:
 write: 
     mov rax, SYS_WRITE
     mov rdx, PAGE_SIZE
-    mov rsi, [rsp+8+65536]                                ;buffer
+    mov rsi, [rsp+8]                                ;buffer
     mov rdi, [rsp+4]                                ; p[1]
     syscall
 
@@ -48,8 +48,8 @@ write:
 ; *******************
 read: 
     mov rdx, PAGE_SIZE
-    lea rsi,  [rsp+8+65536]                         ;buffer
-    lea rdi,  [rsp+8]                          ; p[0]
+    lea rsi,  [rsp+8]                         ;buffer
+    lea rdi,  [rsp]                          ; p[0]
     mov rax, SYS_READ
     syscall
 
