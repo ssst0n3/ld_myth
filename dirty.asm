@@ -3,13 +3,10 @@ global _start
 section .text
 
 _start:
-    xor rbp, rbp
-    mov rdi, rsp
-    and rsp, -16
-    call open
+    call main
 
 main:
-    sub rsp, 32
+    sub rsp, 32+4096+65536
 
 ; *******************
 ; open
