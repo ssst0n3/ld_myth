@@ -12,3 +12,7 @@ _start:   mov       rax, 1                  ; system call for write
 
           section   .rodata
 message:  db        "Hello, YHSPY!", 10      ; note the newline at the end
+
+
+          section   .data
+message2:  db        "Hello, YHSPY!", 10      ; note the newline at the end
